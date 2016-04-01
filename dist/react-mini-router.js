@@ -1,4 +1,4 @@
-/*! ReactMiniRouter 1.2.0 - https://github.com/larrymyers/react-mini-router */
+/*! ReactMiniRouter 2.0.0 - https://github.com/larrymyers/react-mini-router */
 var ReactMiniRouter =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -299,10 +299,23 @@ var ReactMiniRouter =
 
 	    pairs.forEach(function(pair) {
 	        var keyVal = pair.split('=');
+	        var currentVal = parsed[decodeURIComponent(keyVal[0])];
 
-	        parsed[decodeURIComponent(keyVal[0])] = decodeURIComponent(keyVal[1]);
+	        // Handle multi keys. If the value already exists, handle it by appending it as an array.
+	        if (currentVal && currentVal.constructor === Array) {
+	            var newValue = decodeURIComponent(keyVal[1]);
+	            if (isNaN(newValue)) {
+	                currentVal.push(newValue);
+	            } else {
+	                currentVal.push(newValue.toString());
+	            }
+	            parsed[decodeURIComponent(keyVal[0])] = currentVal;
+	        } else if (currentVal) {
+	            parsed[decodeURIComponent(keyVal[0])] = [currentVal, decodeURIComponent(keyVal[1])];
+	        } else {
+	            parsed[decodeURIComponent(keyVal[0])] = decodeURIComponent(keyVal[1]);
+	        }
 	    });
-
 	    return parsed;
 	}
 
